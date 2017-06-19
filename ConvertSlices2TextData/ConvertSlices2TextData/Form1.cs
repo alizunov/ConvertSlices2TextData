@@ -15,6 +15,13 @@ namespace ConvertSlices2TextData
         public Form1()
         {
             InitializeComponent();
+
+            FOVX_numericUpDown.Minimum = 0;
+            FOVX_numericUpDown.Maximum = 1000;
+            FOVY_numericUpDown.Minimum = 0;
+            FOVY_numericUpDown.Maximum = 1000;
+            FOVX_numericUpDown.Value = 295;
+            FOVY_numericUpDown.Value = 255;
         }
 
         private void OpenImages_button_Click(object sender, EventArgs e)
@@ -39,9 +46,9 @@ namespace ConvertSlices2TextData
                 List<double> Delays = new List<double>();
 
                 // Image size-X: strings #9, 10
-                double SizeX = 0;
+                Int32 SizeX = 0;
                 // Image size-Y: strings #11, 12
-                double SizeY = 0;
+                Int32 SizeY = 0;
 
                 foreach(string HeaderFile in opd1.FileNames)
                 {
@@ -56,8 +63,8 @@ namespace ConvertSlices2TextData
                             TextReadout.Add(str);
                         sr.Close();
                         Delays.Add(Convert.ToDouble(TextReadout.ElementAt(16)) + Convert.ToDouble(TextReadout.ElementAt(17)));
-                        SizeX = Convert.ToDouble(TextReadout.ElementAt(10)) - Convert.ToDouble(TextReadout.ElementAt(9)) + 1;
-                        SizeY = Convert.ToDouble(TextReadout.ElementAt(12)) - Convert.ToDouble(TextReadout.ElementAt(11)) + 1;
+                        SizeX = Convert.ToInt32(TextReadout.ElementAt(10)) - Convert.ToInt32(TextReadout.ElementAt(9)) + 1;
+                        SizeY = Convert.ToInt32(TextReadout.ElementAt(12)) - Convert.ToInt32(TextReadout.ElementAt(11)) + 1;
                         // Read the image, the file name = the header file name with the last symbol cut (.imgh -> .img)
                         string ImageFileName = HeaderFile.Substring(0, HeaderFile.Length - 1);
                         System.IO.BinaryReader br = new System.IO.BinaryReader(System.IO.File.Open(ImageFileName, System.IO.FileMode.Open));
@@ -66,7 +73,27 @@ namespace ConvertSlices2TextData
                         while (br.BaseStream.Position != br.BaseStream.Length)
                             ImageData.Add(br.ReadUInt16());
                         br.Close();
-                        MessageBox.Show("Image samples read: " + (ImageData.Count()-4).ToString() + ", SizeX*SizeY: " + (SizeX*SizeY).ToString() );
+                        int ReadoutLength = ImageData.Count;
+                        //MessageBox.Show("Image samples read: " + (ImageData.Count()-4).ToString() + ", SizeX*SizeY: " + (SizeX*SizeY).ToString() );
+
+                        // Remove 4 last elements
+                        ImageData.RemoveRange(ReadoutLength - 5, 4);
+                        double fovx = Convert.ToDouble(FOVX_numericUpDown.Value);
+                        double fovy = Convert.ToDouble(FOVY_numericUpDown.Value);
+                        // Create curve
+                        MakeCurveFromROIdata crv = new MakeCurveFromROIdata(ImageData, SizeX, SizeY);
+                        crv.FOVX = fovx;
+                        crv.FOVY = fovy;
+                        crv.ScaleDimAxis();
+                        // Write point pairs to the text file (.txt)
+                        string CurveFileName = ImageFileName.Substring(0, ImageFileName.Length - 3) + "txt";
+                        System.IO.StreamWriter sw = new System.IO.StreamWriter(CurveFileName);
+                        sw.Write(crv.Coord + "\n");
+                        for (int ip=0; ip < crv.Npoints; ip++)
+                        {
+                            sw.Write(crv.Dimpoints.ElementAt(ip) + " " + crv.Curve.ElementAt(ip) + "\n");
+                        }
+                        sw.Close();
                     }
                     catch (Exception ex)
                     {
@@ -87,6 +114,26 @@ namespace ConvertSlices2TextData
                 }
 
             }
+
+        }
+
+        private void FOVX_numericUpDown_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+
+        private void FOVY_numericUpDown_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+        private void FOVX_label_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void FOVY_label_Click(object sender, EventArgs e)
+        {
 
         }
     }
