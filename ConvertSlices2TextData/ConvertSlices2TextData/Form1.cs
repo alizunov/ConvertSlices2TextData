@@ -28,7 +28,7 @@ namespace ConvertSlices2TextData
         {
             OpenFileDialog opd1 = new OpenFileDialog();
             opd1.Filter = "Header files (*.imgh)|*.imgh|All files (*.*)|*.*";
-            opd1.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            //opd1.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
             opd1.Multiselect = true;
             opd1.Title = "Browse multiple Image/Header";
 
@@ -112,7 +112,7 @@ namespace ConvertSlices2TextData
                 {
                     MessageBox.Show("Cannot create the file for timing entries. Original error: " + ex.Message);
                 }
-
+                MessageBox.Show("Images processed: " + opd1.FileNames.Count() );
             }
 
         }

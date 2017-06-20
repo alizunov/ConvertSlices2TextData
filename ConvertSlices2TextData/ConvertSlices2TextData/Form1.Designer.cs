@@ -41,11 +41,11 @@
             // 
             this.OpenImages_button.ForeColor = System.Drawing.SystemColors.Highlight;
             this.OpenImages_button.Location = new System.Drawing.Point(129, 15);
-            this.OpenImages_button.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.OpenImages_button.Margin = new System.Windows.Forms.Padding(4);
             this.OpenImages_button.Name = "OpenImages_button";
-            this.OpenImages_button.Size = new System.Drawing.Size(119, 28);
+            this.OpenImages_button.Size = new System.Drawing.Size(155, 28);
             this.OpenImages_button.TabIndex = 0;
-            this.OpenImages_button.Text = "Open Images";
+            this.OpenImages_button.Text = "Open Image Headers";
             this.OpenImages_button.UseVisualStyleBackColor = true;
             this.OpenImages_button.Click += new System.EventHandler(this.OpenImages_button_Click);
             // 
@@ -95,7 +95,7 @@
             this.Controls.Add(this.FOVX_label);
             this.Controls.Add(this.FOVX_numericUpDown);
             this.Controls.Add(this.OpenImages_button);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.FOVX_numericUpDown)).EndInit();
