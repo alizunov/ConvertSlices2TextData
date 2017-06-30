@@ -22,6 +22,8 @@ namespace ConvertSlices2TextData
             FOVY_numericUpDown.Maximum = 1000;
             FOVX_numericUpDown.Value = 295;
             FOVY_numericUpDown.Value = 255;
+            SubROIY_comboBox.Items.AddRange(new object[] { "Full size", "10 px", "20 px" });
+            SubROIY_comboBox.SelectedIndex = 2;
         }
 
         private void OpenImages_button_Click(object sender, EventArgs e)
@@ -49,6 +51,19 @@ namespace ConvertSlices2TextData
                 Int32 SizeX = 0;
                 // Image size-Y: strings #11, 12
                 Int32 SizeY = 0;
+
+                // Height of sub-ROI-Y for calculation of emission profile in the beam edge (top Sub-ROI) and closer to the beam axis (bottom Sub-ROI)
+                string SubROI_str = SubROIY_comboBox.SelectedItem.ToString();
+                Int32 SubROI = 0;
+                try
+                {
+                    if (SubROI_str.Substring(0, 4) != "Full")
+                        SubROI = Convert.ToInt32(SubROI_str.Substring(0, 2));
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Cannot read Sub-ROI Y-size. Original error: " + ex.Message);
+                }
 
                 foreach(string HeaderFile in opd1.FileNames)
                 {
@@ -80,20 +95,61 @@ namespace ConvertSlices2TextData
                         ImageData.RemoveRange(ReadoutLength - 5, 4);
                         double fovx = Convert.ToDouble(FOVX_numericUpDown.Value);
                         double fovy = Convert.ToDouble(FOVY_numericUpDown.Value);
-                        // Create curve
-                        MakeCurveFromROIdata crv = new MakeCurveFromROIdata(ImageData, SizeX, SizeY);
-                        crv.FOVX = fovx;
-                        crv.FOVY = fovy;
-                        crv.ScaleDimAxis();
-                        // Write point pairs to the text file (.txt)
-                        string CurveFileName = ImageFileName.Substring(0, ImageFileName.Length - 3) + "txt";
-                        System.IO.StreamWriter sw = new System.IO.StreamWriter(CurveFileName);
-                        sw.Write(crv.Coord + "\n");
-                        for (int ip=0; ip < crv.Npoints; ip++)
+                        // Create curve(s)
+                        if (SubROI == 0) // Full size
                         {
-                            sw.Write(crv.Dimpoints.ElementAt(ip) + " " + crv.Curve.ElementAt(ip) + "\n");
+                            MakeCurveFromROIdata crv = new MakeCurveFromROIdata(ImageData, SizeX, SizeY);
+                            crv.FOVX = fovx;
+                            crv.FOVY = fovy;
+                            crv.ScaleDimAxis();
+                            // Write point pairs to the text file (.txt)
+                            string CurveFileName = ImageFileName.Substring(0, ImageFileName.Length - 3) + "txt";
+                            System.IO.StreamWriter sw = new System.IO.StreamWriter(CurveFileName);
+                            sw.Write(crv.Coord + "\n");
+                            for (int ip = 0; ip < crv.Npoints; ip++)
+                            {
+                                sw.Write(crv.Dimpoints.ElementAt(ip) + " " + crv.Curve.ElementAt(ip) + "\n");
+                            }
+                            sw.Close();
                         }
-                        sw.Close();
+                        else
+                        {
+                            if (SizeX > SizeY) // X-profile
+                            {
+                                // Top sub-ROIY
+                                MakeCurveFromROIdata crv1 = new MakeCurveFromROIdata(ImageData.GetRange(0, SizeX*SubROI), SizeX, SubROI);
+                                crv1.FOVX = fovx;
+                                crv1.FOVY = fovy*SubROI/SizeY;
+                                crv1.ScaleDimAxis();
+                                // Bottom sub-ROIY
+                                MakeCurveFromROIdata crv2 = new MakeCurveFromROIdata(ImageData.GetRange(SizeX*SizeY - SizeX*SubROI, SizeX*SubROI), SizeX, SubROI);
+                                crv2.FOVX = fovx;
+                                crv2.FOVY = fovy*SubROI/SizeY;
+                                crv2.ScaleDimAxis();
+                                // Write point pairs to the text files (.txt)
+                                string CurveFileName1 = ImageFileName.Substring(0, ImageFileName.Length - 4) + "-top.txt";
+                                System.IO.StreamWriter sw1 = new System.IO.StreamWriter(CurveFileName1);
+                                sw1.Write(crv1.Coord + "\n");
+                                for (int ip = 0; ip < crv1.Npoints; ip++)
+                                {
+                                    sw1.Write(crv1.Dimpoints.ElementAt(ip) + " " + crv1.Curve.ElementAt(ip) + "\n");
+                                }
+                                sw1.Close();
+                                string CurveFileName2 = ImageFileName.Substring(0, ImageFileName.Length - 4) + "-bottom.txt";
+                                System.IO.StreamWriter sw2 = new System.IO.StreamWriter(CurveFileName2);
+                                sw2.Write(crv2.Coord + "\n");
+                                for (int ip = 0; ip < crv2.Npoints; ip++)
+                                {
+                                    sw2.Write(crv2.Dimpoints.ElementAt(ip) + " " + crv2.Curve.ElementAt(ip) + "\n");
+                                }
+                                sw2.Close();
+                            }
+                            else // Y-profile
+                            {
+                                MessageBox.Show("Y-profiles from two sub-ROIX: not implemented yet.");
+                            }
+                        }
+
                     }
                     catch (Exception ex)
                     {
@@ -112,7 +168,7 @@ namespace ConvertSlices2TextData
                 {
                     MessageBox.Show("Cannot create the file for timing entries. Original error: " + ex.Message);
                 }
-                MessageBox.Show("Images processed: " + opd1.FileNames.Count() );
+                MessageBox.Show("Images processed: " + opd1.FileNames.Count() + ", sub-ROI mode: " + SubROI_str + " (sub-ROI size: " + SubROI.ToString() + ")" );
             }
 
         }
@@ -133,6 +189,11 @@ namespace ConvertSlices2TextData
         }
 
         private void FOVY_label_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void SubROIY_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
 
         }

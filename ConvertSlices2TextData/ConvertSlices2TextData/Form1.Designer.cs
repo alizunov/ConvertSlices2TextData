@@ -33,6 +33,8 @@
             this.FOVX_label = new System.Windows.Forms.Label();
             this.FOVY_label = new System.Windows.Forms.Label();
             this.FOVY_numericUpDown = new System.Windows.Forms.NumericUpDown();
+            this.SubROIY_comboBox = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.FOVX_numericUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.FOVY_numericUpDown)).BeginInit();
             this.SuspendLayout();
@@ -85,11 +87,32 @@
             this.FOVY_numericUpDown.TabIndex = 4;
             this.FOVY_numericUpDown.ValueChanged += new System.EventHandler(this.FOVY_numericUpDown_ValueChanged);
             // 
+            // SubROIY_comboBox
+            // 
+            this.SubROIY_comboBox.FormattingEnabled = true;
+            this.SubROIY_comboBox.Location = new System.Drawing.Point(129, 131);
+            this.SubROIY_comboBox.Name = "SubROIY_comboBox";
+            this.SubROIY_comboBox.Size = new System.Drawing.Size(96, 24);
+            this.SubROIY_comboBox.TabIndex = 5;
+            this.SubROIY_comboBox.Text = "Y-size (px)";
+            this.SubROIY_comboBox.SelectedIndexChanged += new System.EventHandler(this.SubROIY_comboBox_SelectedIndexChanged);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(129, 83);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(119, 17);
+            this.label1.TabIndex = 6;
+            this.label1.Text = "Y-size of sub-ROI";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(379, 322);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.SubROIY_comboBox);
             this.Controls.Add(this.FOVY_numericUpDown);
             this.Controls.Add(this.FOVY_label);
             this.Controls.Add(this.FOVX_label);
@@ -112,6 +135,8 @@
         private System.Windows.Forms.Label FOVX_label;
         private System.Windows.Forms.Label FOVY_label;
         private System.Windows.Forms.NumericUpDown FOVY_numericUpDown;
+        private System.Windows.Forms.ComboBox SubROIY_comboBox;
+        private System.Windows.Forms.Label label1;
     }
 }
 

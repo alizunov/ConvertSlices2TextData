@@ -8,8 +8,8 @@ namespace ConvertSlices2TextData
 {
     /// <summary>
     /// Converts 1d list of UInt16 data to the profile (curve). Takes Size-X and Size-Y parameters of the data ROI. 
-    /// Data size must be Size-X * Size-Y. The bigger of Size-X, Size-Y is considered as a profile resolved dimension, 
-    /// the other dimension is averaged.
+    /// Data size must be Size-X * Size-Y. The bigger of Size-X, Size-Y is considered as a profile resolved dimension. 
+    /// The other dimension is averaged over the full size.
     /// </summary>
     public class MakeCurveFromROIdata
     {
